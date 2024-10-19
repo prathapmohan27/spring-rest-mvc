@@ -16,6 +16,6 @@ class BeerControllerTest {
 
     @Test
     void findBeerById() {
-        System.out.println(beerController.findBeerById(UUID.randomUUID()).toString());
+        System.out.println(beerController.findBeerById(UUID.randomUUID()));
     }
 }

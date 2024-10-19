@@ -9,4 +9,8 @@ public interface CustomerService {
 
     List<Customer> findAll();
     Customer findById(UUID id);
+    Customer saveCustomer(Customer customer);
+    void updateCustomer(UUID id, Customer customer);
+    void deleteCustomer(UUID id);
+    void patchCustomer(UUID id, Customer customer);
 }

@@ -17,10 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -146,12 +143,18 @@ class BeerControllerTest {
     @Test
     void findBeerById() throws Exception {
         Beer beer = beers.getFirst();
-        when(beerServiceImpl.findBeerById(beer.getId())).thenReturn(beer);
+        when(beerServiceImpl.findBeerById(beer.getId())).thenReturn(Optional.of(beer));
         mockMvc.perform(get(BeerController.BEER_BY_ID_URI, beer.getId())
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id", is(beer.getId().toString())))
                 .andExpect(jsonPath("$.beerName", is(beer.getBeerName())));
+    }
+
+    @Test
+    void findBeerByIdNotFound() throws Exception {
+        when(beerServiceImpl.findBeerById(any(UUID.class))).thenReturn(Optional.empty());
+        mockMvc.perform(get(BeerController.BEER_BY_ID_URI, UUID.randomUUID())).andExpect(status().isNotFound());
     }
 }

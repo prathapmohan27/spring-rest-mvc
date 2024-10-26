@@ -1,6 +1,6 @@
 package com.springframewok.springrestmvc.services;
 
-import ch.qos.logback.core.util.StringUtil;
+import com.springframewok.springrestmvc.controller.NotFoundException;
 import com.springframewok.springrestmvc.model.Beer;
 import com.springframewok.springrestmvc.model.BeerStyle;
 import lombok.extern.slf4j.Slf4j;
@@ -67,9 +67,9 @@ public class BeerServiceImpl implements BeerService {
     }
 
     @Override
-    public Beer findBeerById(UUID id) {
+    public Optional<Beer> findBeerById(UUID id) {
         log.info("Find beer by id: {}", id);
-        return beerMap.get(id);
+        return Optional.of(beerMap.get(id));
     }
 
     @Override

@@ -14,10 +14,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -123,7 +120,7 @@ class CustomerControllerTest {
     @Test
     void getCustomerById() throws Exception {
         Customer customer = customers.getFirst();
-        when(customerServiceImpl.findById(customer.getId())).thenReturn(customer);
+        when(customerServiceImpl.findById(customer.getId())).thenReturn(Optional.of(customer));
         mockMvc.perform(get(CustomerController.CUSTOMER_BY_ID_URI, customer.getId())
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -141,4 +138,11 @@ class CustomerControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.size()", is(2)));
     }
+
+    @Test
+    void getCustomerByIdNotFound() throws Exception {
+        when(customerServiceImpl.findById(any(UUID.class))).thenReturn(Optional.empty());
+        mockMvc.perform(get(CustomerController.CUSTOMER_BY_ID_URI, UUID.randomUUID())).andExpect(status().isNotFound());
+    }
+
 }

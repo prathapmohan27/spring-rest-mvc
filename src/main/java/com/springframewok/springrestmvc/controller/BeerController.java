@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -29,7 +30,7 @@ public class BeerController  {
     @GetMapping(BEER_BY_ID_URI)
     public Beer findBeerById(@PathVariable("beerId") UUID beerId) {
         log.info("Find beer by id: {}", beerId);
-        return beerService.findBeerById(beerId);
+        return beerService.findBeerById(beerId).orElseThrow(NotFoundException::new);
     }
 
     @PostMapping(BEER_URI)

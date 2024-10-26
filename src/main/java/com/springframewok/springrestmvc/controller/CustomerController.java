@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -26,7 +27,7 @@ public class CustomerController {
     @GetMapping( CUSTOMER_BY_ID_URI)
     public Customer getCustomerById(@PathVariable("customerId") UUID customerId) {
         log.info("Get customer by id: {}", customerId);
-        return customerService.findById(customerId);
+        return customerService.findById(customerId).orElseThrow(NotFoundException::new);
     }
 
     @GetMapping(CUSTOMER_URI)

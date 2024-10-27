@@ -1,7 +1,7 @@
 package com.springframewok.springrestmvc.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.springframewok.springrestmvc.model.Beer;
+import com.springframewok.springrestmvc.model.BeerDTO;
 import com.springframewok.springrestmvc.model.BeerStyle;
 import com.springframewok.springrestmvc.services.BeerServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,7 +10,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -37,7 +36,7 @@ class BeerControllerTest {
     ObjectMapper objectMapper;
 
     @Captor
-    ArgumentCaptor<Beer> beerArgumentCaptor;
+    ArgumentCaptor<BeerDTO> beerArgumentCaptor;
 
     @Captor
     ArgumentCaptor<UUID> beerIdArgumentCaptor;
@@ -45,12 +44,12 @@ class BeerControllerTest {
     @MockitoBean
     BeerServiceImpl beerServiceImpl;
 
-    Map<UUID, Beer> beerMap = new HashMap<>();
-    ArrayList<Beer> beers;
+    Map<UUID, BeerDTO> beerMap = new HashMap<>();
+    ArrayList<BeerDTO> beers;
 
     @BeforeEach
     void setUp() {
-        Beer beer1 = Beer.builder()
+        BeerDTO beer1 = BeerDTO.builder()
                 .id(UUID.randomUUID())
                 .version(1)
                 .beerName("crank")
@@ -62,7 +61,7 @@ class BeerControllerTest {
                 .updatedOn(LocalDateTime.now())
                 .build();
 
-        Beer beer2 = Beer.builder()
+        BeerDTO beer2 = BeerDTO.builder()
                 .id(UUID.randomUUID())
                 .version(1)
                 .beerName("kingfisher")
@@ -81,10 +80,10 @@ class BeerControllerTest {
 
     @Test
     void createBeer() throws Exception {
-        Beer beer = beers.getFirst();
+        BeerDTO beer = beers.getFirst();
         beer.setId(null);
         beer.setVersion(null);
-        when(beerServiceImpl.saveBeer(any(Beer.class))).thenReturn(beers.getLast());
+        when(beerServiceImpl.saveBeer(any(BeerDTO.class))).thenReturn(beers.getLast());
         mockMvc.perform(post(BeerController.BEER_URI)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -95,7 +94,7 @@ class BeerControllerTest {
 
     @Test
     void updateBeer() throws Exception {
-        Beer beer = beers.getFirst();
+        BeerDTO beer = beers.getFirst();
         beer.setVersion(10);
 
         mockMvc.perform(put( BeerController.BEER_BY_ID_URI, beer.getId())
@@ -103,12 +102,12 @@ class BeerControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(beer)))
                 .andExpect(status().isNoContent());
-        verify(beerServiceImpl).updateBeer(any(UUID.class), any(Beer.class));
+        verify(beerServiceImpl).updateBeer(any(UUID.class), any(BeerDTO.class));
     }
 
     @Test
     void deleteBeer() throws Exception {
-        Beer beer = beers.getFirst();
+        BeerDTO beer = beers.getFirst();
         mockMvc.perform(delete(BeerController.BEER_BY_ID_URI, beer.getId())
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
@@ -118,7 +117,7 @@ class BeerControllerTest {
 
     @Test
     void patchBeer() throws Exception {
-        Beer beer = beers.getFirst();
+        BeerDTO beer = beers.getFirst();
         Map<String, Object> beerMap = new HashMap<>();
         beerMap.put("beerName", "hello");
         mockMvc.perform(patch(BeerController.BEER_BY_ID_URI, beer.getId())
@@ -142,7 +141,7 @@ class BeerControllerTest {
 
     @Test
     void findBeerById() throws Exception {
-        Beer beer = beers.getFirst();
+        BeerDTO beer = beers.getFirst();
         when(beerServiceImpl.findBeerById(beer.getId())).thenReturn(Optional.of(beer));
         mockMvc.perform(get(BeerController.BEER_BY_ID_URI, beer.getId())
                         .accept(MediaType.APPLICATION_JSON))

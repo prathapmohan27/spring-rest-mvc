@@ -1,7 +1,7 @@
 package com.springframewok.springrestmvc.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.springframewok.springrestmvc.model.Customer;
+import com.springframewok.springrestmvc.model.CustomerDTO;
 import com.springframewok.springrestmvc.services.CustomerServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,7 +34,7 @@ class CustomerControllerTest {
     ObjectMapper objectMapper;
 
     @Captor
-    ArgumentCaptor<Customer> customerCaptor;
+    ArgumentCaptor<CustomerDTO> customerCaptor;
 
     @Captor
     ArgumentCaptor<UUID> customerIdCaptor;
@@ -42,20 +42,20 @@ class CustomerControllerTest {
     @MockitoBean
     CustomerServiceImpl customerServiceImpl;
 
-    Map<UUID, Customer> customerMap = new HashMap<>();
-    ArrayList<Customer> customers;
+    Map<UUID, CustomerDTO> customerMap = new HashMap<>();
+    ArrayList<CustomerDTO> customers;
 
     @BeforeEach
     void setUp() {
         customerMap = new HashMap<>();
-        Customer customer1 = Customer.builder()
+        CustomerDTO customer1 = CustomerDTO.builder()
                 .id(UUID.randomUUID())
                 .customerName("John Doe")
                 .version(12)
                 .creationDate(LocalDateTime.now())
                 .lastUpdateDate(LocalDateTime.now())
                 .build();
-        Customer customer2 = Customer.builder()
+        CustomerDTO customer2 = CustomerDTO.builder()
                 .id(UUID.randomUUID())
                 .customerName("Antony")
                 .version(12)
@@ -69,10 +69,10 @@ class CustomerControllerTest {
 
     @Test
     void createCustomer() throws Exception {
-        Customer customer = customers.getFirst();
+        CustomerDTO customer = customers.getFirst();
         customer.setId(null);
         customer.setVersion(null);
-        when(customerServiceImpl.saveCustomer(any(Customer.class))).thenReturn(customers.getLast());
+        when(customerServiceImpl.saveCustomer(any(CustomerDTO.class))).thenReturn(customers.getLast());
         mockMvc.perform(post(CustomerController.CUSTOMER_URI)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -83,19 +83,19 @@ class CustomerControllerTest {
 
     @Test
     void updateCustomer() throws Exception {
-        Customer customer = customers.getFirst();
+        CustomerDTO customer = customers.getFirst();
         customer.setVersion(10);
         mockMvc.perform(put(CustomerController.CUSTOMER_BY_ID_URI, customer.getId())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(customer)))
                 .andExpect(status().isNoContent());
-        verify(customerServiceImpl).updateCustomer(any(UUID.class), any(Customer.class));
+        verify(customerServiceImpl).updateCustomer(any(UUID.class), any(CustomerDTO.class));
     }
 
     @Test
     void deleteCustomer() throws Exception {
-        Customer customer = customers.getFirst();
+        CustomerDTO customer = customers.getFirst();
         mockMvc.perform(delete(CustomerController.CUSTOMER_BY_ID_URI, customer.getId())
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
@@ -105,7 +105,7 @@ class CustomerControllerTest {
 
     @Test
     void patchCustomer() throws Exception {
-        Customer customer = customers.getFirst();
+        CustomerDTO customer = customers.getFirst();
         Map<String, Object> customerMap = new HashMap<>();
         customerMap.put("customerName", "John wick");
         mockMvc.perform(patch(CustomerController.CUSTOMER_BY_ID_URI, customer.getId())
@@ -119,7 +119,7 @@ class CustomerControllerTest {
 
     @Test
     void getCustomerById() throws Exception {
-        Customer customer = customers.getFirst();
+        CustomerDTO customer = customers.getFirst();
         when(customerServiceImpl.findById(customer.getId())).thenReturn(Optional.of(customer));
         mockMvc.perform(get(CustomerController.CUSTOMER_BY_ID_URI, customer.getId())
                         .accept(MediaType.APPLICATION_JSON))

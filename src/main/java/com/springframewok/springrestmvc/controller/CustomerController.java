@@ -1,6 +1,6 @@
 package com.springframewok.springrestmvc.controller;
 
-import com.springframewok.springrestmvc.model.Customer;
+import com.springframewok.springrestmvc.model.CustomerDTO;
 import com.springframewok.springrestmvc.services.CustomerService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -25,28 +24,28 @@ public class CustomerController {
     }
 
     @GetMapping( CUSTOMER_BY_ID_URI)
-    public Customer getCustomerById(@PathVariable("customerId") UUID customerId) {
+    public CustomerDTO getCustomerById(@PathVariable("customerId") UUID customerId) {
         log.info("Get customer by id: {}", customerId);
         return customerService.findById(customerId).orElseThrow(NotFoundException::new);
     }
 
     @GetMapping(CUSTOMER_URI)
-    public List<Customer> getAllCustomers() {
+    public List<CustomerDTO> getAllCustomers() {
         log.info("Get all customers");
         return customerService.findAll();
     }
 
     @PostMapping(CUSTOMER_URI)
-    public ResponseEntity<?> createCustomer(@RequestBody Customer customer) {
+    public ResponseEntity<?> createCustomer(@RequestBody CustomerDTO customer) {
         log.info("Create customer: {}", customer);
-        Customer data = customerService.saveCustomer(customer);
+        CustomerDTO data = customerService.saveCustomer(customer);
         HttpHeaders responseHeader = new HttpHeaders();
         responseHeader.add(HttpHeaders.LOCATION, "/api/v1/customer/" + data.getId());
         return new ResponseEntity<>(responseHeader, HttpStatus.CREATED);
     }
 
     @PutMapping(CUSTOMER_BY_ID_URI)
-    public ResponseEntity<?> updateCustomer(@PathVariable("customerId") UUID id, @RequestBody Customer customer) {
+    public ResponseEntity<?> updateCustomer(@PathVariable("customerId") UUID id, @RequestBody CustomerDTO customer) {
         log.info("Update customer: {}", customer);
         customerService.updateCustomer(id, customer);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -60,7 +59,7 @@ public class CustomerController {
     }
 
     @PatchMapping(CUSTOMER_BY_ID_URI)
-    public ResponseEntity<?> patchCustomer(@PathVariable("customerId") UUID customerId, @RequestBody Customer customer) {
+    public ResponseEntity<?> patchCustomer(@PathVariable("customerId") UUID customerId, @RequestBody CustomerDTO customer) {
         log.info("Patch customer: {}", customer);
         customerService.patchCustomer(customerId, customer);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);

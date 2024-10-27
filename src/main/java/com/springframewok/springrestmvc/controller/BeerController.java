@@ -1,7 +1,7 @@
 package com.springframewok.springrestmvc.controller;
 
 
-import com.springframewok.springrestmvc.model.Beer;
+import com.springframewok.springrestmvc.model.BeerDTO;
 import com.springframewok.springrestmvc.services.BeerService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -23,27 +22,27 @@ public class BeerController  {
     private final BeerService beerService;
 
     @GetMapping(BEER_URI)
-    public List<Beer> getAllBeers() {
+    public List<BeerDTO> getAllBeers() {
         return beerService.getAllBeers();
     }
 
     @GetMapping(BEER_BY_ID_URI)
-    public Beer findBeerById(@PathVariable("beerId") UUID beerId) {
+    public BeerDTO findBeerById(@PathVariable("beerId") UUID beerId) {
         log.info("Find beer by id: {}", beerId);
         return beerService.findBeerById(beerId).orElseThrow(NotFoundException::new);
     }
 
     @PostMapping(BEER_URI)
-    public ResponseEntity<?> createBeer(@RequestBody Beer beer) {
+    public ResponseEntity<?> createBeer(@RequestBody BeerDTO beer) {
         log.info("Create beer: {}", beer);
-        Beer data = beerService.saveBeer(beer);
+        BeerDTO data = beerService.saveBeer(beer);
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.add(HttpHeaders.LOCATION, "/api/v1/beer/" + data.getId());
         return new ResponseEntity<>(responseHeaders, HttpStatus.CREATED);
     }
 
     @PutMapping(BEER_BY_ID_URI)
-    public ResponseEntity<?> updateBeer( @PathVariable("beerId") UUID id,  @RequestBody Beer beer) {
+    public ResponseEntity<?> updateBeer( @PathVariable("beerId") UUID id,  @RequestBody BeerDTO beer) {
         log.info("Update beer: {}", beer);
         beerService.updateBeer(id, beer);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -57,7 +56,7 @@ public class BeerController  {
     }
 
     @PatchMapping(BEER_BY_ID_URI)
-    public ResponseEntity<?> patchBeer(@PathVariable("beerId") UUID beerId, @RequestBody Beer beer) {
+    public ResponseEntity<?> patchBeer(@PathVariable("beerId") UUID beerId, @RequestBody BeerDTO beer) {
         log.info("Patch beer: {}", beer);
         beerService.patchBeer(beerId, beer);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);

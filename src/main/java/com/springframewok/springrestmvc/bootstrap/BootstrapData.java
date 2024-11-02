@@ -2,9 +2,7 @@ package com.springframewok.springrestmvc.bootstrap;
 
 import com.springframewok.springrestmvc.entities.Beer;
 import com.springframewok.springrestmvc.entities.Customer;
-import com.springframewok.springrestmvc.model.BeerDTO;
 import com.springframewok.springrestmvc.model.BeerStyle;
-import com.springframewok.springrestmvc.model.CustomerDTO;
 import com.springframewok.springrestmvc.repositories.BeerRepository;
 import com.springframewok.springrestmvc.repositories.CustomerRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,10 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor

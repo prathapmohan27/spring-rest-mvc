@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,21 +35,40 @@ public class CustomerServiceJPA implements CustomerService {
 
     @Override
     public CustomerDTO saveCustomer(CustomerDTO customer) {
-        return null;
+        return customerMapper.toCustomerDTO(customerRepository.save(customerMapper.toCustomer(customer)));
     }
 
     @Override
-    public void updateCustomer(UUID id, CustomerDTO customer) {
-
+    public Optional<CustomerDTO> updateCustomer(UUID id, CustomerDTO customer) {
+        AtomicReference<Optional<CustomerDTO>> atomicReference = new AtomicReference<>();
+        customerRepository.findById(id).ifPresentOrElse(existingCustomer -> {
+            existingCustomer.setCustomerName(customer.getCustomerName());
+            atomicReference.set(Optional.of(customerMapper.toCustomerDTO(customerRepository.save(existingCustomer))));
+        }, () -> {
+            atomicReference.set(Optional.empty());
+        });
+        return atomicReference.get();
     }
 
     @Override
-    public void deleteCustomer(UUID id) {
-
+    public Boolean deleteCustomer(UUID id) {
+        if (!customerRepository.existsById(id)) return false;
+        customerRepository.deleteById(id);
+        return true;
     }
 
     @Override
-    public void patchCustomer(UUID id, CustomerDTO customer) {
+    public Optional<CustomerDTO> patchCustomer(UUID id, CustomerDTO customer) {
+        AtomicReference<Optional<CustomerDTO>> atomicReference = new AtomicReference<>();
+        customerRepository.findById(id).ifPresentOrElse(existingCustomer -> {
+            if(!existingCustomer.getCustomerName().equals(customer.getCustomerName())) {
+                existingCustomer.setCustomerName(customer.getCustomerName());
+            }
+            atomicReference.set(Optional.of(customerMapper.toCustomerDTO(customerRepository.save(existingCustomer))));
+        }, () -> {
+            atomicReference.set(Optional.empty());
+        });
+        return atomicReference.get();
 
     }
 }

@@ -44,14 +44,16 @@ public class BeerController  {
     @PutMapping(BEER_BY_ID_URI)
     public ResponseEntity<?> updateBeer( @PathVariable("beerId") UUID id,  @RequestBody BeerDTO beer) {
         log.info("Update beer: {}", beer);
-        beerService.updateBeer(id, beer);
+        if(beerService.updateBeer(id, beer).isEmpty()) {
+            throw new NotFoundException();
+        }
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @DeleteMapping(BEER_BY_ID_URI)
     public ResponseEntity<?> deleteBeer(@PathVariable("beerId") UUID beerId) {
         log.info("Delete beer: {}", beerId);
-        beerService.deleteBeer(beerId);
+        if(!beerService.deleteBeer(beerId)) throw new NotFoundException();
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 

@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,7 +34,7 @@ public class BeerController  {
     }
 
     @PostMapping(BEER_URI)
-    public ResponseEntity<?> createBeer(@RequestBody BeerDTO beer) {
+    public ResponseEntity<?> createBeer( @Validated @RequestBody BeerDTO beer) {
         log.info("Create beer: {}", beer);
         BeerDTO data = beerService.saveBeer(beer);
         HttpHeaders responseHeaders = new HttpHeaders();
@@ -42,7 +43,7 @@ public class BeerController  {
     }
 
     @PutMapping(BEER_BY_ID_URI)
-    public ResponseEntity<?> updateBeer( @PathVariable("beerId") UUID id,  @RequestBody BeerDTO beer) {
+    public ResponseEntity<?> updateBeer( @PathVariable("beerId") UUID id, @Validated @RequestBody BeerDTO beer) {
         log.info("Update beer: {}", beer);
         if(beerService.updateBeer(id, beer).isEmpty()) {
             throw new NotFoundException();
@@ -60,7 +61,7 @@ public class BeerController  {
     @PatchMapping(BEER_BY_ID_URI)
     public ResponseEntity<?> patchBeer(@PathVariable("beerId") UUID beerId, @RequestBody BeerDTO beer) {
         log.info("Patch beer: {}", beer);
-        beerService.patchBeer(beerId, beer);
+        if(beerService.patchBeer(beerId, beer).isEmpty()) throw new NotFoundException();
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

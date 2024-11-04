@@ -13,6 +13,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -97,7 +98,7 @@ class BeerControllerTest {
         BeerDTO beer = beers.getFirst();
         beer.setVersion(10);
         when(beerServiceImpl.updateBeer(any(UUID.class), any(BeerDTO.class))).thenReturn(Optional.of(beer));
-        mockMvc.perform(put( BeerController.BEER_BY_ID_URI, beer.getId())
+        mockMvc.perform(put(BeerController.BEER_BY_ID_URI, beer.getId())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(beer)))
@@ -157,5 +158,42 @@ class BeerControllerTest {
     void findBeerByIdNotFound() throws Exception {
         when(beerServiceImpl.findBeerById(any(UUID.class))).thenReturn(Optional.empty());
         mockMvc.perform(get(BeerController.BEER_BY_ID_URI, UUID.randomUUID())).andExpect(status().isNotFound());
+    }
+
+    @Test
+    void testNullBeerName() throws Exception {
+        BeerDTO beerDTO = BeerDTO.builder().build();
+        MvcResult result = mockMvc.perform(post(BeerController.BEER_URI)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(beerDTO)))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+        System.out.println(result.getResponse().getContentAsString());
+    }
+
+    @Test
+    void testBeerPrice() throws Exception {
+        BeerDTO beerDTO = BeerDTO.builder().price(BigDecimal.valueOf(0)).build();
+        MvcResult result = mockMvc.perform(post(BeerController.BEER_URI)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(beerDTO)))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+        System.out.println(result.getResponse().getContentAsString());
+    }
+
+    @Test
+    void testUpdateBlankName() throws Exception {
+        BeerDTO beerDTO = beers.getFirst();
+        beerDTO.setBeerName("");
+        mockMvc.perform(put(BeerController.BEER_BY_ID_URI, beerDTO.getId())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(beerDTO)))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+
     }
 }

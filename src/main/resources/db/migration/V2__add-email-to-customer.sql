@@ -1,0 +1,1 @@
+ALTER TABLE customer add email varchar(255);

@@ -7,9 +7,12 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.type.SqlTypes;
+import org.springframework.data.annotation.CreatedDate;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -47,6 +50,9 @@ public class Beer {
     @Positive
     @NotNull
     private BigDecimal price;
+    @CreationTimestamp
     private LocalDateTime createdOn;
+    @UpdateTimestamp
+    @Column(insertable = false)
     private LocalDateTime updatedOn;
 }

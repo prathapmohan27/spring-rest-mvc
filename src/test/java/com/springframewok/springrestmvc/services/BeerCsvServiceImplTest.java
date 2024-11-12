@@ -18,8 +18,6 @@ class BeerCsvServiceImplTest {
     @Test
     void convertBeerToCsv() throws FileNotFoundException {
 
-//        File file = new File("src/test/resources/beers.csv");
-
         File file = ResourceUtils.getFile("classpath:csvData/beers.csv");
         List<BeerCsvRecord> beers = beerCsvService.convertCsvToBeers(file);
 

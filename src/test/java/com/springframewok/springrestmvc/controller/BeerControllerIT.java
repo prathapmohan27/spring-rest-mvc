@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.springframewok.springrestmvc.entities.Beer;
 import com.springframewok.springrestmvc.mappers.BeerMapper;
 import com.springframewok.springrestmvc.model.BeerDTO;
+import com.springframewok.springrestmvc.model.BeerStyle;
 import com.springframewok.springrestmvc.repositories.BeerRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,8 +26,11 @@ import java.util.Map;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -55,8 +59,8 @@ class BeerControllerIT {
 
     @Test
     void listBeers() {
-        List<BeerDTO> beers = beerController.getAllBeers();
-        assertThat(beers.size()).isEqualTo(2413);
+        List<BeerDTO> beers = beerController.getAllBeers(null, null, 1, 25).getContent();
+        assertThat(beers.size()).isEqualTo(25);
     }
 
     @Rollback
@@ -64,14 +68,14 @@ class BeerControllerIT {
     @Test
     void checkEmptyList() {
         beerRepository.deleteAll();
-        List<BeerDTO> beers = beerController.getAllBeers();
+        List<BeerDTO> beers = beerController.getAllBeers(null, null, 1, 25).getContent();
         assertThat(beers.size()).isEqualTo(0);
     }
 
 
     @Test
     void getBeerById() {
-        BeerDTO beer = beerController.getAllBeers().getFirst();
+        BeerDTO beer = beerController.getAllBeers(null, null, 1, 25).getContent().getFirst();
         assertThat(beer).isNotNull();
     }
 
@@ -157,6 +161,40 @@ class BeerControllerIT {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(beerMap)))
                 .andExpect(status().isBadRequest());
+    }
+
+
+    @Test
+    void searchBeer() throws Exception {
+        mockMvc.perform(get(BeerController.BEER_URI)
+                        .queryParam("beerName", "IPA")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.size()", greaterThan(10)));
+        ;
+    }
+
+    @Test
+    void getByBeerStyle() throws Exception {
+        mockMvc.perform(get(BeerController.BEER_URI)
+                        .queryParam("style", BeerStyle.LAGER.name())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.size()", greaterThan(10)));
+        ;
+    }
+
+    @Test
+    void pageTest() throws Exception {
+        mockMvc.perform(get(BeerController.BEER_URI)
+                        .queryParam("beerName", "IPA")
+                        .queryParam("style", BeerStyle.LAGER.name())
+                        .queryParam("pageNumber", String.valueOf(2))
+                        .queryParam("pageSize", String.valueOf(25))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.size()", greaterThan(10)));
+        ;
     }
 
 }

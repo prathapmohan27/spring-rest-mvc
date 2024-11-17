@@ -8,8 +8,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -134,12 +136,13 @@ class BeerControllerTest {
 
     @Test
     void listBeers() throws Exception {
-        when(beerServiceImpl.getAllBeers()).thenReturn(beers);
+        when(beerServiceImpl.getAllBeers(any(), any(), any(), any())).thenReturn(new PageImpl<>(beers));
+//                .thenCallRealMethod(beerServiceImpl.getAllBeers(null, null));
         mockMvc.perform(get(BeerController.BEER_URI)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.size()", is(2)));
+                .andExpect(jsonPath("$.content.length()", is(2)));
     }
 
     @Test

@@ -1,6 +1,5 @@
 package com.springframewok.springrestmvc.bootstrap;
 
-import com.springframewok.springrestmvc.controller.BeerController;
 import com.springframewok.springrestmvc.repositories.BeerRepository;
 import com.springframewok.springrestmvc.repositories.CustomerRepository;
 import com.springframewok.springrestmvc.services.BeerCsvService;

@@ -2,16 +2,17 @@ package com.springframewok.springrestmvc.controller;
 
 
 import com.springframewok.springrestmvc.model.BeerDTO;
+import com.springframewok.springrestmvc.model.BeerStyle;
 import com.springframewok.springrestmvc.services.BeerService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -23,8 +24,12 @@ public class BeerController  {
     private final BeerService beerService;
 
     @GetMapping(BEER_URI)
-    public List<BeerDTO> getAllBeers() {
-        return beerService.getAllBeers();
+    public Page<BeerDTO> getAllBeers(
+            @RequestHeader(required = false) String beerName,
+            @RequestHeader(required = false) BeerStyle style,
+            @RequestHeader(required = false) Integer pageNumber,
+            @RequestHeader(required = false) Integer pageSize) {
+        return beerService.getAllBeers(beerName, style, pageNumber, pageSize);
     }
 
     @GetMapping(BEER_BY_ID_URI)

@@ -3,6 +3,8 @@ package com.springframewok.springrestmvc.services;
 import com.springframewok.springrestmvc.model.BeerDTO;
 import com.springframewok.springrestmvc.model.BeerStyle;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -61,8 +63,8 @@ public class BeerServiceImpl implements BeerService {
     }
 
     @Override
-    public List<BeerDTO> getAllBeers() {
-        return new ArrayList<>(beerMap.values());
+    public Page<BeerDTO> getAllBeers(String beerName, BeerStyle beerStyle, Integer pageNumber, Integer pageSize) {
+        return new PageImpl<>(new ArrayList<>(beerMap.values()));
     }
 
     @Override
